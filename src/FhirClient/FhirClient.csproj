@@ -2,9 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <UserSecretsId>853002f8-0d55-4e50-895f-e82e9e815957</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hl7.Fhir.STU3" Version="0.96.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
