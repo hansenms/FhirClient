@@ -5,11 +5,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using FhirClient.Models;
+using FhirClient.Services;
 
 namespace FhirClient.Controllers
 {
     public class HomeController : Controller
     {
+        private IEasyAuthProxy _easyAuthProxy { get; set; }
+        public HomeController(IEasyAuthProxy easyAuthProxy)
+        {
+            _easyAuthProxy = easyAuthProxy;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -18,13 +25,15 @@ namespace FhirClient.Controllers
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
-
+            ViewData["token"] = _easyAuthProxy.Headers["X-MS-TOKEN-AAD-ACCESS-TOKEN"];
+            ViewData["UPN"] = _easyAuthProxy.Headers["X-MS-CLIENT-PRINCIPAL-NAME"];
             return View();
         }
 
         public IActionResult Contact()
         {
             ViewData["Message"] = "Your contact page.";
+
 
             return View();
         }

@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using FhirClient.Services;
 
 namespace FhirClient
 {
@@ -31,7 +33,8 @@ namespace FhirClient
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddTransient<IEasyAuthProxy, EasyAuthProxy>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
