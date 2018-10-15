@@ -35,6 +35,7 @@ namespace FhirClient
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IEasyAuthProxy, EasyAuthProxy>();
+            services.AddSingleton<IPatientReservoir>(provider => new AzureFilesPatientReservoir(Configuration["ReservoirConnectionString"], "synthea"));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
