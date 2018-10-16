@@ -97,7 +97,7 @@ namespace FhirClient.Services
             }
             else
             {
-                return _privateHeaders["X-MS-TOKEN-AAD-ACCESS-TOKEN"];
+                return Headers["X-MS-TOKEN-AAD-ACCESS-TOKEN"];
             }
         }
     }
