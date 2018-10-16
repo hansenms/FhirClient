@@ -23,24 +23,8 @@ namespace FhirClient.Controllers
         public async Task<IActionResult> Index()
         {
             ViewData["NumberOfPatients"] = await PatientReservoir.GetNumberOfPatientsAsync();
-            //ViewData["NextPatient"] = await PatientReservoir.GetNextPatientJson();
-            ViewData["NextPatient"] = Request.Headers["X-ZUMO-AUTH"];
+            ViewData["NextPatient"] = await PatientReservoir.GetNextPatientJson();
             return View();
-        }
-
-        public async Task<string> Refresh()
-        {
-            string prefix = Request.IsHttps? "https" : "http";
-            var baseAddress = new Uri($"{prefix}://{Request.Host.ToString()}");
-            var cookieContainer = new CookieContainer();
-            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
-            {
-                cookieContainer.Add(baseAddress, new Cookie("AppServiceAuthSession", Request.Cookies["AppServiceAuthSession"]));
-                var result = await client.GetAsync("/.auth/refresh");
-                result.EnsureSuccessStatusCode();
-                return await result.Content.ReadAsStringAsync();
-            }
         }
     }
 }
