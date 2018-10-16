@@ -23,9 +23,9 @@ namespace FhirClient.Controllers
             Configuration = config;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var client = GetClient();
+            var client = await GetClientAsync();
             Bundle result = client.Search<Patient>();
             List<Patient> patientResults = new List<Patient>();
             foreach (var e in result.Entry)
@@ -36,13 +36,18 @@ namespace FhirClient.Controllers
             return View(patientResults);
         }
 
+        public async Task<string> CheckToken()
+        {
+            return await _easyAuthProxy.GetAadAccessToken();
+        }
 
-        private Hl7.Fhir.Rest.FhirClient GetClient()
+        private async Task<Hl7.Fhir.Rest.FhirClient> GetClientAsync()
         {
             var client = new Hl7.Fhir.Rest.FhirClient(Configuration["FhirServerUrl"]);
+            var token = await _easyAuthProxy.GetAadAccessToken();
             client.OnBeforeRequest += (object sender, BeforeRequestEventArgs e) =>
             {
-                e.RawRequest.Headers.Add("Authorization", $"Bearer {_easyAuthProxy.Headers["X-MS-TOKEN-AAD-ACCESS-TOKEN"]}");
+                e.RawRequest.Headers.Add("Authorization", $"Bearer {token}");
             };
             client.PreferredFormat = ResourceFormat.Json;
             return client;

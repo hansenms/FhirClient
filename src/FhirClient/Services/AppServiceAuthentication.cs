@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -29,6 +31,7 @@ namespace FhirClient.Services
     public interface IEasyAuthProxy
     {
         Microsoft.AspNetCore.Http.IHeaderDictionary Headers {get; }
+        Task<string> GetAadAccessToken();
     }
  
     public class EasyAuthProxy: IEasyAuthProxy
@@ -63,6 +66,39 @@ namespace FhirClient.Services
             get { 
                 return _privateHeaders == null ? _contextAccessor.HttpContext.Request.Headers : _privateHeaders; 
             } 
+        }
+
+
+        public bool TokenIsExpired()
+        {
+            DateTime expires_on = DateTime.Parse(Headers["X-MS-TOKEN-AAD-EXPIRES-ON"]);
+            return (expires_on - DateTime.Now).TotalMinutes < 1;
+        }
+        public async Task<string> GetAadAccessToken()
+        {
+            if (_privateHeaders == null && TokenIsExpired())
+            {
+                Console.WriteLine("Token is expired refreshing...");
+                HttpRequest req = _contextAccessor.HttpContext.Request;
+                string prefix = req.IsHttps? "https" : "http";
+                var baseAddress = new Uri($"{prefix}://{req.Host.ToString()}");
+                var cookieContainer = new CookieContainer();
+                using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
+                using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
+                {
+                    cookieContainer.Add(baseAddress, new Cookie("AppServiceAuthSession", req.Cookies["AppServiceAuthSession"]));
+                    var result = await client.GetAsync("/.auth/refresh");
+                    result.EnsureSuccessStatusCode();
+                    result = await client.GetAsync("/.auth/me");
+                    result.EnsureSuccessStatusCode();
+                    List<AuthMe> authme = JsonConvert.DeserializeObject<List<AuthMe>>(await result.Content.ReadAsStringAsync());
+                    return authme[0].access_token;
+                }
+            }
+            else
+            {
+                return Headers["X-MS-TOKEN-AAD-ACCESS-TOKEN"];
+            }
         }
     }
 }
