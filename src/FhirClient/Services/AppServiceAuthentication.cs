@@ -68,10 +68,17 @@ namespace FhirClient.Services
             } 
         }
 
+
+        public bool TokenIsExpired()
+        {
+            DateTime expires_on = DateTime.Parse(Headers["X-MS-TOKEN-AAD-EXPIRES-ON"]);
+            return (expires_on - DateTime.Now).TotalMinutes > 1;
+        }
         public async Task<string> GetAadAccessToken()
         {
-            if (_privateHeaders == null)
+            if (_privateHeaders == null && TokenIsExpired())
             {
+                Console.WriteLine("Token is expired refreshing...");
                 HttpRequest req = _contextAccessor.HttpContext.Request;
                 string prefix = req.IsHttps? "https" : "http";
                 var baseAddress = new Uri($"{prefix}://{req.Host.ToString()}");
@@ -84,8 +91,8 @@ namespace FhirClient.Services
                     result.EnsureSuccessStatusCode();
                     result = await client.GetAsync("/.auth/me");
                     result.EnsureSuccessStatusCode();
-                    dynamic jsonResponse = JArray.Parse(await result.Content.ReadAsStringAsync());
-                    return jsonResponse[0]["access_token"];
+                    List<AuthMe> authme = JsonConvert.DeserializeObject<List<AuthMe>>(await result.Content.ReadAsStringAsync());
+                    return authme[0].access_token;
                 }
             }
             else
@@ -93,8 +100,5 @@ namespace FhirClient.Services
                 return _privateHeaders["X-MS-TOKEN-AAD-ACCESS-TOKEN"];
             }
         }
-
-
-
     }
 }
