@@ -84,7 +84,7 @@ namespace FhirClient.Services
                     result.EnsureSuccessStatusCode();
                     result = await client.GetAsync("/.auth/me");
                     result.EnsureSuccessStatusCode();
-                    dynamic jsonResponse = JObject.Parse(await result.Content.ReadAsStringAsync());
+                    dynamic jsonResponse = JArray.Parse(await result.Content.ReadAsStringAsync());
                     return jsonResponse[0]["access_token"];
                 }
             }
