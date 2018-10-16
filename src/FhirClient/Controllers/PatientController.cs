@@ -42,7 +42,7 @@ namespace FhirClient.Controllers
             var client = new Hl7.Fhir.Rest.FhirClient(Configuration["FhirServerUrl"]);
             client.OnBeforeRequest += (object sender, BeforeRequestEventArgs e) =>
             {
-                e.RawRequest.Headers.Add("Authorization", $"Bearer {_easyAuthProxy.Headers["X-MS-TOKEN-AAD-ACCESS-TOKEN"]}");
+                e.RawRequest.Headers.Add("Authorization", $"Bearer {_easyAuthProxy.GetAadAccessToken()}");
             };
             client.PreferredFormat = ResourceFormat.Json;
             return client;
