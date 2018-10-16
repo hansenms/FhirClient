@@ -72,7 +72,7 @@ namespace FhirClient.Services
         public bool TokenIsExpired()
         {
             DateTime expires_on = DateTime.Parse(Headers["X-MS-TOKEN-AAD-EXPIRES-ON"]);
-            return (expires_on - DateTime.Now).TotalMinutes > 1;
+            return (expires_on - DateTime.Now).TotalMinutes < 1;
         }
         public async Task<string> GetAadAccessToken()
         {
