@@ -9,48 +9,34 @@ using FhirClient.Models;
 using FhirClient.Services;
 using Hl7.Fhir.Model;
 using Hl7.Fhir.Rest;
+using System.Net.Http;
 
 namespace FhirClient.Controllers
 {
-    public class PatientController : Controller
+    public class ResourceController : Controller
     {
         private IEasyAuthProxy _easyAuthProxy { get; set; }
         private IConfiguration Configuration { get; set; }
-
-        public PatientController(IEasyAuthProxy easyAuthProxy, IConfiguration config)
+        public ResourceController(IEasyAuthProxy easyAuthProxy, IConfiguration config)
         {
             _easyAuthProxy = easyAuthProxy;
             Configuration = config;
         }
 
-        public async Task<IActionResult> Index()
+        [HttpGet("/Resource/{resourceType}/{resourceId}")]
+        public async Task<IActionResult> GetAction(string resourceType, string resourceId)
         {
-            var client = await GetClientAsync();
-            Bundle result = null;
-            
-            if (!String.IsNullOrEmpty(Request.Query["ct"]))
+            using (var client = new HttpClient())
             {
-                string cont = Request.Query["ct"];
-                result = client.Search<Patient>(new string [] { $"ct={cont}"});
-            }
-            else
-            {
-                result = client.Search<Patient>();
-            }
-            List<Patient> patientResults = new List<Patient>();
-            foreach (var e in result.Entry)
-            {
-                patientResults.Add((Patient)e.Resource);
-            }
+                client.BaseAddress = new Uri(Configuration["FhirServerUrl"]);
+                var token = await _easyAuthProxy.GetAadAccessToken();
 
-            ViewData["NextLink"] = result.NextLink.PathAndQuery;
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            return View(patientResults);
-        }
-
-        public async Task<string> CheckToken()
-        {
-            return await _easyAuthProxy.GetAadAccessToken();
+                HttpResponseMessage result = await client.GetAsync($"/{resourceType}/{resourceId}");
+                ViewData["ResourceJson"] = await result.Content.ReadAsStringAsync();
+            }
+            return View("Index");
         }
 
         private async Task<Hl7.Fhir.Rest.FhirClient> GetClientAsync()
