@@ -1,7 +1,34 @@
+@model IEnumerable<string>
+
 @{
     ViewData["Title"] = "Patient Reservoir";
 }
 
 <h2>@ViewData["Title"]</h2>
-<p><b>Number of patients:</b> @ViewData["NumberOfPatients"]</p>
-<p><b>Next Patient:</b> @ViewData["NextPatient"]</p>
+
+<p><b>Number of patients in Reservoir:</b> @ViewData["NumberOfPatients"]</p>
+<p>First @ViewData["PatientsInList"] patients: </p>
+
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    Bundle File Name
+                </th>
+                
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+            <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item)
+            </td>
+            <td>
+                <a asp-action="PushBundle" asp-route-id="@item">Import</a> 
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
