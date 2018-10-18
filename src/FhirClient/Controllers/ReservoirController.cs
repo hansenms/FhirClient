@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using System.Text;
+using System.Net.Http.Headers;
 
 namespace FhirClient.Controllers
 {
@@ -39,7 +40,6 @@ namespace FhirClient.Controllers
         [HttpGet("/Reservoir/PushBundle/{bundleFileName}")]
         public async Task<IActionResult> PushBundle(string bundleFileName)
         {
-            Console.WriteLine($"Bundle: {bundleFileName}");
             string bundleJson = await PatientReservoir.GetFhirBundleAndDelete(bundleFileName);
             if (!String.IsNullOrEmpty(bundleJson))
             {
@@ -47,7 +47,9 @@ namespace FhirClient.Controllers
 
                 JArray entries = (JArray)o["entry"];
 
-                Console.WriteLine("Number of entries: " + entries.Count);
+                var client = new HttpClient();
+                client.BaseAddress = new Uri(Configuration["FhirServerUrl"]);
+                client.DefaultRequestHeaders.Add("x-ms-consistency-level", "Eventual");
 
                 for (int i = 0; i < entries.Count; i++)
                 {
@@ -92,32 +94,28 @@ namespace FhirClient.Controllers
                         entry_json = (((JObject)entries[i])["resource"]).ToString();
                     }
 
-                    using (var client = new HttpClient())
-                    {
-                        client.BaseAddress = new Uri(Configuration["FhirServerUrl"]);
-                        var token = await _easyAuthProxy.GetAadAccessToken();
+                    var token = await _easyAuthProxy.GetAadAccessToken();
 
-                        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-                        client.DefaultRequestHeaders.Add("x-ms-consistency-level", "Eventual");
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Add("x-ms-consistency-level", "Eventual");
+                    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
                         
-                        StringContent content = new StringContent(entry_json, Encoding.UTF8, "application/json");
+                    StringContent content = new StringContent(entry_json, Encoding.UTF8, "application/json");
+                    HttpResponseMessage uploadResult = null;
 
-                        HttpResponseMessage uploadResult = null;
+                    if (String.IsNullOrEmpty(id))
+                    {
+                        uploadResult = await client.PostAsync($"/{resource_type}", content);
+                    }
+                    else
+                    {
+                        uploadResult = await client.PutAsync($"/{resource_type}/{id}", content);
+                    }
 
-                        if (String.IsNullOrEmpty(id))
-                        {
-                            uploadResult = await client.PostAsync($"/{resource_type}", content);
-                        }
-                        else
-                        {
-                            uploadResult = await client.PutAsync($"/{resource_type}/{id}", content);
-                        }
-
-                        if (!uploadResult.IsSuccessStatusCode)
-                        {
-                            string resultContent = await uploadResult.Content.ReadAsStringAsync();
-                            Console.WriteLine(resultContent);
-                        }
+                    if (!uploadResult.IsSuccessStatusCode)
+                    {
+                        string resultContent = await uploadResult.Content.ReadAsStringAsync();
+                        Console.WriteLine(resultContent);
                     }
                 }
             }

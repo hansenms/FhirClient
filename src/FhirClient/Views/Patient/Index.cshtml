@@ -4,7 +4,7 @@
 }
 
 <h2>@ViewData["Title"]</h2>
-@if (ViewData["NextLink"] != "")
+@if (!String.IsNullOrEmpty((string)ViewData["NextLink"]))
 {
 <p><a href="@ViewData["NextLink"]">NEXT</a></p>
 
