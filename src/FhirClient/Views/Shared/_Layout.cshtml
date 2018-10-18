@@ -15,8 +15,14 @@
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
+    <script lang="JavaScript">
+    function doHourglass()
+    {
+        document.body.style.cursor = 'wait';
+    }
+    </script>
 </head>
-<body>
+<body onbeforeunload="doHourglass();" onunload="doHourglass();">
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
