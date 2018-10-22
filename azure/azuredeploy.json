@@ -97,6 +97,20 @@
                 "southcentralus",
                 "westus2"
             ]
+        },
+        "fhirServerUrl": {
+            "type": "string",
+            "defaultValue": "http://vonk.fire.ly",
+            "metadata": {
+                "description": "URL of FHIR Server"
+            }
+        },
+        "reservoirConnectionString": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Storage account connection string for patient reservoir"
+            }
         }
     },
     "variables": {
@@ -167,7 +181,9 @@
                         "APPINSIGHTS_PORTALINFO": "ASP.NETCORE",
                         "APPINSIGHTS_PROFILERFEATURE_VERSION": "1.0.0",
                         "APPINSIGHTS_SNAPSHOTFEATURE_VERSION": "1.0.0",
-                        "WEBSITE_NODE_DEFAULT_VERSION": "6.9.4"
+                        "WEBSITE_NODE_DEFAULT_VERSION": "6.9.4",
+                        "FhirServerUrl": "[parameters('fhirServerUrl')]",
+                        "ReservoirConnectionString": "[parameters('reservoirConnectionString')]"
                       }                  
                 },
                 {

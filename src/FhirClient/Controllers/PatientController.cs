@@ -38,12 +38,16 @@ namespace FhirClient.Controllers
                 result = client.Search<Patient>();
             }
             List<Patient> patientResults = new List<Patient>();
-            foreach (var e in result.Entry)
-            {
-                patientResults.Add((Patient)e.Resource);
+            if (result.Entry != null) {
+                foreach (var e in result.Entry)
+                {
+                    patientResults.Add((Patient)e.Resource);
+                }
             }
 
-            ViewData["NextLink"] = result.NextLink.PathAndQuery;
+            if (result.NextLink != null) {
+                ViewData["NextLink"] = result.NextLink.PathAndQuery;
+            }
 
             return View(patientResults);
         }
