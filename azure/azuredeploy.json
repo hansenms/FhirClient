@@ -126,7 +126,7 @@
         {
             "condition": "[empty(parameters('appServicePlanResourceGroup'))]",
             "apiVersion": "2017-05-10",
-            "name": "nestedTemplate",
+            "name": "fhir-client-nested-asp-template",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
