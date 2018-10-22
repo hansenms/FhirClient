@@ -165,7 +165,7 @@
                 "serverFarmId": "[resourceId(variables('appServicePlanResourceGroup'), 'Microsoft.Web/serverfarms/', variables('appServicePlanName'))]"
             },
             "dependsOn": [
-                "nestedTemplate"
+                "fhir-client-nested-asp-template"
             ],
             "resources": [
                 {
