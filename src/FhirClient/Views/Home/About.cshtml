@@ -1,9 +1,10 @@
 ﻿@{
-    ViewData["Title"] = "About";
+    ViewData["Title"] = "About Me";
 }
-<h2>@ViewData["Title"]</h2>
-<h3>@ViewData["Message"]</h3>
+<h2>Information about the signed in user.</h2>
 
-<p>Use this area to provide additional information.</p>
 <p>UPN: @ViewData["UPN"]</p>
-<p>token: @ViewData["token"]</p>
+<p>Access Token: </p>
+<form>
+    <textarea style="width: 20cm; height: 5cm;">@ViewData["token"]</textarea>
+</form>

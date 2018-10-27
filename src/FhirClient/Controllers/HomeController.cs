@@ -24,7 +24,6 @@ namespace FhirClient.Controllers
 
         public IActionResult About()
         {
-            ViewData["Message"] = "Your application description page.";
             ViewData["token"] = _easyAuthProxy.Headers["X-MS-TOKEN-AAD-ACCESS-TOKEN"];
             ViewData["UPN"] = _easyAuthProxy.Headers["X-MS-CLIENT-PRINCIPAL-NAME"];
             return View();

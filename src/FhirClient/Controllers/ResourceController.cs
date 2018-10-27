@@ -34,21 +34,11 @@ namespace FhirClient.Controllers
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
                 HttpResponseMessage result = await client.GetAsync($"/{resourceType}/{resourceId}");
+                result.EnsureSuccessStatusCode();
+
                 ViewData["ResourceJson"] = await result.Content.ReadAsStringAsync();
             }
             return View("Index");
-        }
-
-        private async Task<Hl7.Fhir.Rest.FhirClient> GetClientAsync()
-        {
-            var client = new Hl7.Fhir.Rest.FhirClient(Configuration["FhirServerUrl"]);
-            var token = await _easyAuthProxy.GetAadAccessToken();
-            client.OnBeforeRequest += (object sender, BeforeRequestEventArgs e) =>
-            {
-                e.RawRequest.Headers.Add("Authorization", $"Bearer {token}");
-            };
-            client.PreferredFormat = ResourceFormat.Json;
-            return client;
         }
     }
 }

@@ -4,6 +4,12 @@
 }
 
 <h2>@ViewData["Title"]</h2>
+
+@if (!String.IsNullOrEmpty((string)ViewData["ErrorMessage"]))
+{
+    <b>ERROR:</b> @ViewData["ErrorMessage"]
+}
+
 @if (!String.IsNullOrEmpty((string)ViewData["NextLink"]))
 {
 <p><a href="@ViewData["NextLink"]">NEXT</a></p>

@@ -27,27 +27,35 @@ namespace FhirClient.Controllers
         {
             var client = await GetClientAsync();
             Bundle result = null;
-            
-            if (!String.IsNullOrEmpty(Request.Query["ct"]))
-            {
-                string cont = Request.Query["ct"];
-                result = client.Search<Patient>(new string [] { $"ct={cont}"});
-            }
-            else
-            {
-                result = client.Search<Patient>();
-            }
             List<Patient> patientResults = new List<Patient>();
-            if (result.Entry != null) {
-                foreach (var e in result.Entry)
-                {
-                    patientResults.Add((Patient)e.Resource);
-                }
-            }
 
-            if (result.NextLink != null) {
-                ViewData["NextLink"] = result.NextLink.PathAndQuery;
-            }
+            try {
+                if (!String.IsNullOrEmpty(Request.Query["ct"]))
+                {
+                    string cont = Request.Query["ct"];
+                    result = client.Search<Patient>(new string [] { $"ct={cont}"});
+                }
+                else
+                {
+                    result = client.Search<Patient>();
+                }
+                
+                if (result.Entry != null) {
+                    foreach (var e in result.Entry)
+                    {
+                        patientResults.Add((Patient)e.Resource);
+                    }
+                }
+
+                if (result.NextLink != null) {
+                    ViewData["NextLink"] = result.NextLink.PathAndQuery;
+                }
+
+            } 
+            catch (Exception e)
+            {
+                ViewData["ErrorMessage"] = e.Message;
+            } 
 
             return View(patientResults);
         }
