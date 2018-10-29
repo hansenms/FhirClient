@@ -1,4 +1,15 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+<h1>FHIR Demonstration Client</h1>
 
+<div>
+<p>This is a simple FHIR client, which can be used to demonstrate interaction with a FHIR server.</p>
+<p>You can find the source code for the client at <a href="https://github.com/hansenms/FhirClient">https://github.com/hansenms/FhirClient</a></p> 
+<p>It connects with a FHIR server and an Azure Blob storage account. The storage account contains patients generated with the <a href="https://synthetichealth.github.io/synthea/">Synthea</a> patient generator. The Synthea generator can be spun up in an Azure Container instance using the <a href="https://github.com/hansenms/SyntheaACI">SyntheaACI template</a>. The diagram below outlines the architecture.</p>
+<p>The client offers two entry points: <a href="/Patient">Patients</a> where you can browse some patient data and <a href="/Reservoir">Reservoir</a> where you can import patients from the strorage account to the FHIR server.</p>
+</div>
+
+<div style="text-align: center;">
+<img style="width: 300px;" src="images/architecture.png" />
+</div>
