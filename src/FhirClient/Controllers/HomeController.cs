@@ -6,15 +6,19 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using FhirClient.Models;
 using FhirClient.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace FhirClient.Controllers
 {
     public class HomeController : Controller
     {
         private IEasyAuthProxy _easyAuthProxy { get; set; }
-        public HomeController(IEasyAuthProxy easyAuthProxy)
+        private IConfiguration Configuration { get; set; }
+
+        public HomeController(IEasyAuthProxy easyAuthProxy, IConfiguration config)
         {
             _easyAuthProxy = easyAuthProxy;
+            Configuration = config;
         }
 
         public IActionResult Index()
@@ -26,6 +30,8 @@ namespace FhirClient.Controllers
         {
             ViewData["token"] = _easyAuthProxy.Headers["X-MS-TOKEN-AAD-ACCESS-TOKEN"];
             ViewData["UPN"] = _easyAuthProxy.Headers["X-MS-CLIENT-PRINCIPAL-NAME"];
+            ViewData["FhirServerUrl"] = Configuration["FhirServerUrl"];
+            
             return View();
         }
 
